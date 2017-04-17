@@ -1,0 +1,23 @@
+# assignment requirements
+click
+kafka-python
+numpy
+
+# dev requirements
+pip-tools
+readline
+
+# project requirements
+flask
+flask-marshmallow
+flask-migrate
+flask-script
+flask-SQLAlchemy
+kafka-python
+marshmallow
+marshmallow_sqlalchemy
+SQLAlchemy
+mysqlclient
+
+# testing requirements
+pytest
