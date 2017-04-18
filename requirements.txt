@@ -24,8 +24,9 @@ numpy==1.12.1
 pip-tools==1.9.0
 py==1.4.33                # via pytest
 pytest==3.0.7
+python-dateutil==2.6.0
 python-editor==1.0.3      # via alembic
 readline==6.2.4.1
-six==1.10.0               # via flask-marshmallow, pip-tools
+six==1.10.0               # via flask-marshmallow, pip-tools, python-dateutil
 sqlalchemy==1.1.9
 werkzeug==0.12.1          # via flask

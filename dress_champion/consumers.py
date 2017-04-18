@@ -32,11 +32,11 @@ class DressConsumer:
 
     def consume_dresses(self):
         """Consume messages from the 'dresses' topic and add a new dress to the database."""
-        self._consume(self.DRESSES_TOPIC, self._consume_dresses_message)
+        self._consume(self.DRESSES_TOPIC, Dress.consume_dresses_payload)
 
     def consume_ratings(self):
         """Consumer messages from the 'ratings' topic and record the rating for a dress."""
-        self._consume(self.RATINGS_TOPIC, self._consume_ratings_message)
+        self._consume(self.RATINGS_TOPIC, Dress.consume_ratings_payload)
 
     def _consume(self, topic, handler):
         # TODO: https://github.com/dpkp/kafka-python/issues/690
@@ -45,31 +45,20 @@ class DressConsumer:
             consumer = KafkaConsumer(
                 topic,
                 bootstrap_servers=self.kafka_host_port,
-                group_id='dress-consumers',
+                group_id='{}-consumers'.format(topic),
                 # auto_offset_reset='earliest',
+                value_deserializer=lambda m: json.loads(m.decode('ascii')),
             )
         except Exception as e:
             raise ConsumerSetupException(e)
         try:
-            for msg in consumer:
-                handler(msg)
+            log.info("Starting '%s' consumer..." % topic)
+            for msg in consumer:  # type: ConsumerRecord
+                log.info('Processing payload with id: %s' % msg.key)
+                handler(msg.value['payload'])
         except KeyboardInterrupt:
             log.warning("Stopping '%s' consumer" % topic)
             consumer.close()
         except Exception as e:
             consumer.close()
             raise RunningConsumerException(e)
-
-
-    def _consume_dresses_message(self, msg: ConsumerRecord):
-        import pdb; pdb.set_trace()
-
-    def _consume_ratings_message(self, msg: ConsumerRecord):
-        # TODO: marshmallow
-        # TODO: error handling
-        # TODO: log non-error not propagating
-        # TODO: json value_deserializer https://kafka-python.readthedocs.io/en/master/usage.html#kafkaconsumer
-        msg_dict = json.loads(msg.value.decode('utf-8'))
-        payload = msg_dict['payload']
-        log.error(payload['dress_id'])
-        Dress.rate_dress(payload['dress_id'], payload['stars'])

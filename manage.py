@@ -10,7 +10,6 @@ from dress_champion.consumers import DressConsumer, DressConsumerException
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 manager = Manager(create_app)
 manager.add_command('db', MigrateCommand)
