@@ -7,6 +7,10 @@ from dress_champion.models import Dress
 ma = Marshmallow()
 
 
-class AuthorSchema(ModelSchema):
+class DressSchema(ModelSchema):
     class Meta:
         model = Dress
+
+
+dress_schema = DressSchema()
+dresses_schema = DressSchema(many=True)

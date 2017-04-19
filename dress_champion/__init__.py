@@ -29,6 +29,9 @@ def create_app(name='dress_champion', config_filename='config.py'):
     from dress_champion.schemas import ma
     ma.init_app(app)
 
+    from dress_champion.api import api
+    api.init_app(app, flask_sqlalchemy_db=db)
+
     Migrate(app, db)
 
     return app

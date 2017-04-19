@@ -16,11 +16,13 @@ flask-marshmallow
 flask-migrate
 flask-script
 flask-SQLAlchemy
+flask-restless
 kafka-python
 marshmallow
 marshmallow_sqlalchemy
 SQLAlchemy
 mysqlclient
+simplejson
 
 # testing requirements
 pytest
