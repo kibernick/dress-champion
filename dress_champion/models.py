@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from dateutil.parser import parse
@@ -7,16 +8,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import DateTime, Integer, Unicode, Numeric
+import pytz
 
 
 db = SQLAlchemy()
+log = logging.getLogger(__name__)
 
 
 class Base(db.Model):
     __abstract__ = True
 
-    created_on = Column(DateTime, default=db.func.now())
-    updated_on = Column(DateTime, default=db.func.now(), onupdate=db.func.now())
+    created_on = Column(DateTime, default=db.func.utc_timestamp())
+    updated_on = Column(DateTime, default=db.func.utc_timestamp(), onupdate=db.func.utc_timestamp())
 
     @classmethod
     def get_or_create(cls, pk_name, pk_value):
@@ -41,6 +44,14 @@ class Base(db.Model):
         return obj
 
 
+def coerce_to_utc(datetime_str):
+    dt = parse(datetime_str)
+    if dt is not None and dt.tzinfo is not None:
+        # Convert any existing timezone information to UTC.
+        dt = dt.astimezone(pytz.UTC)
+    return dt
+
+
 class Dress(Base):
     __tablename__ = 'dresses'
 
@@ -55,12 +66,21 @@ class Dress(Base):
     brand = Column(JSON)
     ratings = Column(JSON)
 
+    def __repr__(self):
+        return "<Dress: {}>".format(self.uid)
+
     @classmethod
-    def consume_dresses_payload(cls, payload: dict):
+    def consume_dresses_payload(cls, msg):
+        # todo: update, NOT create!
+        payload = msg.get('payload')
+        if not payload:
+            log.warning('Missing payload.')
+            return
+
         dress = cls.get_or_create('uid', payload['id'])
 
         # todo: locking
-        dress.activation_date = parse(payload['activation_date'])
+        dress.activation_date = coerce_to_utc(payload['activation_date'])
         dress.name = payload['name']
         dress.season = payload['season']
         dress.price = Decimal(payload['price'])
@@ -71,7 +91,12 @@ class Dress(Base):
         db.session.commit()
 
     @classmethod
-    def consume_ratings_payload(cls, payload: dict):
+    def consume_ratings_payload(cls, msg):
+        payload = msg.get('payload')
+        if not payload:
+            log.warning('Missing payload.')
+            return
+
         dress_uid, rating = payload['dress_id'], payload['stars']
         dress = cls.get_or_create('uid', payload['dress_id'])
 
@@ -90,6 +115,9 @@ class Promotion(Base):
     __tablename__ = 'promotions'
 
     id = Column(Integer, primary_key=True)
+
+    def __repr__(self):
+        return "<Promotion: {}>".format(self.id)
 
 
 dress_promotion = db.Table('dress_promotions',
