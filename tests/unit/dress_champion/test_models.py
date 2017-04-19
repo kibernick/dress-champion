@@ -1,7 +1,5 @@
-import datetime
 from unittest import mock
 
-import pytz
 from sqlalchemy.exc import IntegrityError
 
 from dress_champion.models import Dress

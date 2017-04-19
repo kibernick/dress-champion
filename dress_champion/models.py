@@ -1,6 +1,7 @@
 import logging
 from decimal import Decimal
 
+import pytz
 from dateutil.parser import parse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.mysql import JSON
@@ -8,8 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import DateTime, Integer, Unicode, Numeric
-import pytz
-
 
 db = SQLAlchemy()
 log = logging.getLogger(__name__)
