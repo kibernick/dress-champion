@@ -1,3 +1,8 @@
+"""Tests setup.
+
+`app`, `db` and `session` fixtures based on https://gist.github.com/alexmic/7857543
+
+"""
 import pytest
 
 from dress_champion import create_app
@@ -40,9 +45,9 @@ def db(app, request):
     return _db
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def session(db, request):
-    """Creates a new database session for a test."""
+    """Creates a new database session."""
     connection = db.engine.connect()
     transaction = connection.begin()
 

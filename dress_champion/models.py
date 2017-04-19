@@ -45,7 +45,10 @@ class Base(db.Model):
 
 
 def coerce_to_utc(datetime_str):
-    dt = parse(datetime_str)
+    try:
+        dt = parse(datetime_str)
+    except (TypeError, ValueError):
+        return None
     if dt is not None and dt.tzinfo is not None:
         # Convert any existing timezone information to UTC.
         dt = dt.astimezone(pytz.UTC)
