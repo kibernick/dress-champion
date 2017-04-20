@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('dresses',
     sa.Column('created_on', sa.DateTime(), nullable=True),
     sa.Column('updated_on', sa.DateTime(), nullable=True),
-    sa.Column('uid', sa.Unicode(length=100), nullable=False),
+    sa.Column('id', sa.Unicode(length=100), nullable=False),
     sa.Column('activation_date', sa.DateTime(), nullable=True),
     sa.Column('name', sa.Unicode(length=255), nullable=True),
     sa.Column('season', sa.Unicode(length=20), nullable=True),
@@ -29,7 +29,7 @@ def upgrade():
     sa.Column('images', mysql.JSON(), nullable=True),
     sa.Column('brand', mysql.JSON(), nullable=True),
     sa.Column('ratings', mysql.JSON(), nullable=True),
-    sa.PrimaryKeyConstraint('uid')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('promotions',
     sa.Column('created_on', sa.DateTime(), nullable=True),
@@ -38,9 +38,9 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('dress_promotions',
-    sa.Column('dress_uid', sa.Unicode(length=100), nullable=True),
+    sa.Column('dress_id', sa.Unicode(length=100), nullable=True),
     sa.Column('promotion_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['dress_uid'], ['dresses.uid'], ),
+    sa.ForeignKeyConstraint(['dress_id'], ['dresses.id'], ),
     sa.ForeignKeyConstraint(['promotion_id'], ['promotions.id'], )
     )
     # ### end Alembic commands ###

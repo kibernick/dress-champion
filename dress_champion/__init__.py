@@ -30,7 +30,7 @@ def create_app(name='dress_champion', config_filename='config.py'):
     ma.init_app(app)
 
     from dress_champion.api import api
-    api.init_app(app, flask_sqlalchemy_db=db)
+    api.init_app(app)
 
     Migrate(app, db)
 

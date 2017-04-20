@@ -9,7 +9,7 @@ click==6.7
 first==2.0.1              # via pip-tools
 flask-marshmallow==0.7.0
 flask-migrate==2.0.3
-flask-restless==0.17.0
+flask-restless==1.0.0b1
 flask-script==2.0.5
 flask-sqlalchemy==2.2
 flask==0.12.1

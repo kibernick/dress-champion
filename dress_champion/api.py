@@ -1,8 +1,8 @@
 import flask_restless
 
-from dress_champion.models import Dress
+from dress_champion.models import db, Dress
 
 
-api = flask_restless.APIManager()
+api = flask_restless.APIManager(flask_sqlalchemy_db=db)
 
-api.create_api(Dress, methods=['GET'], primary_key='uid', results_per_page=10)
+api.create_api(Dress, methods=['GET'], additional_attributes=['stars'])

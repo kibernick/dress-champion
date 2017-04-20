@@ -1,5 +1,6 @@
 import logging
 from decimal import Decimal
+from functools import reduce
 
 import pytz
 from dateutil.parser import parse
@@ -63,7 +64,7 @@ def coerce_to_utc(datetime_str):
 class Dress(Base):
     __tablename__ = 'dresses'
 
-    uid = Column(Unicode(length=100), primary_key=True)
+    id = Column(Unicode(length=100), primary_key=True)
 
     activation_date = Column(DateTime)
     name = Column(Unicode(length=255))
@@ -75,7 +76,15 @@ class Dress(Base):
     ratings = Column(JSON)
 
     def __repr__(self):
-        return "<Dress: {}>".format(self.uid)
+        return "<Dress: {}>".format(self.id)
+
+    @property
+    def stars(self):
+        if (self.ratings is None
+            or not isinstance(self.ratings, list)
+            or len(self.ratings) == 0):
+            return None
+        return reduce(lambda x, y: x+y, self.ratings) / len(self.ratings)
 
     @classmethod
     def consume_dresses_payload(cls, msg):
@@ -85,7 +94,7 @@ class Dress(Base):
             log.warning('Missing payload.')
             return
 
-        dress, _ = cls.get_or_create('uid', payload['id'])
+        dress, _ = cls.get_or_create('id', payload['id'])
         updates = {
             'activation_date': coerce_to_utc(payload['activation_date']),
             'name': payload.get('name'),
@@ -109,8 +118,8 @@ class Dress(Base):
             log.warning('Missing payload.')
             return
 
-        dress_uid, rating = payload['dress_id'], payload['stars']
-        dress, _ = cls.get_or_create('uid', payload['dress_id'])
+        dress_id, rating = payload['dress_id'], payload['stars']
+        dress, _ = cls.get_or_create('id', payload['dress_id'])
 
         ratings = dress.ratings if dress.ratings else []
         ratings.append(rating)
@@ -132,6 +141,6 @@ class Promotion(Base):
 
 
 dress_promotion = db.Table('dress_promotions',
-    Column('dress_uid', Unicode(length=100), ForeignKey('dresses.uid')),
+    Column('dress_id', Unicode(length=100), ForeignKey('dresses.id')),
     Column('promotion_id', Integer, ForeignKey('promotions.id')),
 )
