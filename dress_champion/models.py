@@ -47,7 +47,7 @@ class Base(db.Model):
             # Get the latest object with this pk that exists now.
             obj = cls.query.get(pk_value)
             assert obj is not None, "Error retrieving <{}: {}>".format(cls.__name__, pk_value)
-            return cls.query.get(pk_value), False
+            return obj, False
 
 
 def coerce_to_utc(datetime_str):
