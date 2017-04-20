@@ -29,8 +29,9 @@ def create_app(name='dress_champion', config_filename='config.py'):
     from dress_champion.schemas import ma
     ma.init_app(app)
 
-    from dress_champion.api import api
-    api.init_app(app)
+    from dress_champion.api import restless_api, restful_api
+    restless_api.init_app(app)
+    restful_api.init_app(app)
 
     Migrate(app, db)
 

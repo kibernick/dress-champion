@@ -6,10 +6,10 @@ import pytz
 from dateutil.parser import parse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.mysql import JSON
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import DateTime, Integer, Unicode, Numeric
+from sqlalchemy.types import DateTime, Integer, Unicode, Numeric, Text
 
 db = SQLAlchemy()
 log = logging.getLogger(__name__)
@@ -61,6 +61,12 @@ def coerce_to_utc(datetime_str):
     return dt
 
 
+dress_promotion = db.Table('dress_promotions',
+    Column('dress_id', Unicode(length=100), ForeignKey('dresses.id')),
+    Column('promotion_id', Integer, ForeignKey('promotions.id')),
+)
+
+
 class Dress(Base):
     __tablename__ = 'dresses'
 
@@ -74,6 +80,11 @@ class Dress(Base):
     images = Column(JSON)
     brand = Column(JSON)
     ratings = Column(JSON)
+
+    promotions = relationship(
+        "Promotion",
+        secondary=dress_promotion,
+        back_populates="dresses")
 
     def __repr__(self):
         return "<Dress: {}>".format(self.id)
@@ -135,12 +146,18 @@ class Promotion(Base):
     __tablename__ = 'promotions'
 
     id = Column(Integer, primary_key=True)
+    name = Column(Unicode(length=100))
+    content = Column(Text)
+
+    dresses = relationship(
+        "Dress",
+        secondary=dress_promotion,
+        back_populates="promotions")
 
     def __repr__(self):
         return "<Promotion: {}>".format(self.id)
 
-
-dress_promotion = db.Table('dress_promotions',
-    Column('dress_id', Unicode(length=100), ForeignKey('dresses.id')),
-    Column('promotion_id', Integer, ForeignKey('promotions.id')),
-)
+    def add_dress(self, dress: Dress):
+        self.dresses.append(dress)
+        db.session.add(dress)
+        db.session.commit()
