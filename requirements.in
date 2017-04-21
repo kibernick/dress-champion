@@ -7,7 +7,6 @@ numpy
 pip-tools
 readline
 
-# todo: remove marshmallow?
 # project requirements
 python-dateutil
 pytz
