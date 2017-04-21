@@ -32,7 +32,7 @@ class Base(db.Model):
             bool: Was a new instance created or not.
         
         """
-        obj = cls.query.get(pk_value)
+        obj = cls.query.with_for_update().get(pk_value)
         if obj is not None:
             return obj, False
         obj = cls()
@@ -99,7 +99,6 @@ class Dress(Base):
 
     @classmethod
     def consume_dresses_payload(cls, msg):
-        # todo: locking
         payload = msg.get('payload')
         if not payload:
             log.warning('Missing payload.')
@@ -123,7 +122,6 @@ class Dress(Base):
 
     @classmethod
     def consume_ratings_payload(cls, msg):
-        # todo: locking
         payload = msg.get('payload')
         if not payload:
             log.warning('Missing payload.')
